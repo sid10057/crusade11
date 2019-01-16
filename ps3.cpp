@@ -30,11 +30,11 @@ Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
 			{
 				if(variance(img.at<Vec3b>(i,j)[0],img.at<Vec3b>(i,j)[1],img.at<Vec3b>(i,j)[2])>20)
 				{
-					img.at<Vec3b>(i,j)[0]=255;
-					img.at<Vec3b>(i,j)[1]=255;
-					img.at<Vec3b>(i,j)[2]=255;
+					img.at<Vec3b>(i,j)[0]=0;
+					img.at<Vec3b>(i,j)[1]=0;
+					img.at<Vec3b>(i,j)[2]=0;
 				}
-			}
+			} 
 		}
 	for(int i=0;i<img.cols;i++)
 	{
@@ -52,6 +52,16 @@ Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
 			}
 		}
 	}
+	for(int i=0;i<img.rows;i++)
+		{
+			for(int j=0;j<img.cols;j++)
+			{
+				if((variance(img.at<Vec3b>(i,j)[0],img.at<Vec3b>(i,j)[1],img.at<Vec3b>(i,j)[2])>20)&&(img.at<Vec3b>(i,j)[0]>50))
+				{
+					h
+				}
+			}
+		}
 	imshow("colour",img);
 	for(int i=0;i<img.rows;i++)
 		{
@@ -64,12 +74,14 @@ Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
 		{
 			for(int j=0;j<img.cols;j++)
 			{
-				if(img1.at<uchar>(i,j)>70)
+				if(img1.at<uchar>(i,j)>50)
 					img1.at<uchar>(i,j)=255;
+				else
+					img1.at<uchar>(i,j)=0;
 			}
 		}
 	imshow("grey",img1);
-	Canny(img1,img2,255,255*3,3);      //Threshold value(255) determined by inspection 
+	Canny(img1,img2,25,25*3,3);      //Threshold value(255) determined by inspection 
 	imshow("canny",img2);
 	vector<Vec4i>lines;
 	HoughLinesP(img2, lines, 1, CV_PI/180, 100, 50, 10 );

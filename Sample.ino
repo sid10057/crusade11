@@ -1,6 +1,5 @@
 
 
-
 int motorA1 = 4;
 int motorA2 = 3;
 
@@ -13,27 +12,29 @@ int LED = 12;
 
 void left()
 {
-  Serial.println("Motion LEFT");
+  Serial.println("Motion Left");
   analogWrite(pwm1, 80);
   analogWrite(pwm2, 82);
-  digitalWrite(motorA1, HIGH);
   digitalWrite(motorA2, LOW);
+  digitalWrite(motorA1, HIGH);
 
-  digitalWrite(motorB1, HIGH);
-  digitalWrite(motorB2, LOW);
+
+ digitalWrite(motorB1, LOW);
+  digitalWrite(motorB2, HIGH);
 
 
 }
 void right()
 {
-  Serial.println("Motion Right");
+  Serial.println("Motion Rightt");
   analogWrite(pwm1, 80);
   analogWrite(pwm2, 82);
   digitalWrite(motorA1, LOW);
   digitalWrite(motorA2, HIGH);
 
-  digitalWrite(motorB1, LOW);
-  digitalWrite(motorB2, HIGH);
+
+ digitalWrite(motorB2, LOW);
+  digitalWrite(motorB1, HIGH);
   //ledblink();
 
 
@@ -53,11 +54,11 @@ void backward()
   Serial.println("Motion Backward");
   analogWrite(pwm1, 80);
   analogWrite(pwm2, 82);
-  digitalWrite(motorA1, LOW);
-  digitalWrite(motorA2, HIGH);
+  digitalWrite(motorA2, LOW);
+  digitalWrite(motorA1, HIGH);
 
-  digitalWrite(motorB1, HIGH);
   digitalWrite(motorB2, LOW);
+  digitalWrite(motorB1, HIGH);
   /*ledlow();*/
 
 
@@ -69,16 +70,23 @@ void forward()
 
   analogWrite(pwm1, 80);
   analogWrite(pwm2, 82);
-  digitalWrite(motorA1, HIGH);
-  digitalWrite(motorA2, LOW);
+  digitalWrite(motorA1, LOW);
+  digitalWrite(motorA2, HIGH);
 
   digitalWrite(motorB1, LOW);
   digitalWrite(motorB2, HIGH);
-
-
-
-
 }
+//void forward()
+//{
+//    Serial.println("Motion Backward");
+//  analogWrite(pwm1, 80);
+//  analogWrite(pwm2, 82);
+//  digitalWrite(motorA2, LOW);
+//  digitalWrite(motorA1, HIGH);
+//
+//  digitalWrite(motorB1, HIGH);
+//  digitalWrite(motorB2, LOW);
+//}
 void stope()
 {
   Serial.println("Stop");
@@ -102,6 +110,8 @@ void setup()
   pinMode(motorA2, OUTPUT);
   pinMode(motorB1, OUTPUT);
   pinMode(motorB2, OUTPUT);
+  pinMode(pwm1,OUTPUT);
+  pinMode(pwm2,OUTPUT);
 
   pinMode(LED, OUTPUT);
   /* digitalWrite(LED,LOW);*/
@@ -121,7 +131,8 @@ void loop()
     {
 
       forward();
-      delay(1000);
+      Serial.println("Forward");
+    delay(1000);
       stope();
     }
 
@@ -131,20 +142,20 @@ void loop()
     else if (i == 'B')
     {
       backward();
-      delay(1000);
+     delay(1000);
       stope();
     }
 
     else if (i == 'L')
     {
       left();
-      delay(1000);
-      stope();
+      delay(300);
+     stope();
     }
     else if (i == 'R')
     {
       right();
-      delay(1000);
+      delay(300);
       stope();
     }
     else if (i == 'S')
@@ -154,7 +165,10 @@ void loop()
       ledblink();
     }
 
-    else Serial.println("invalid command");
+    else {
+      Serial.println("invalid command");
+      }
+   
   }
 
 }

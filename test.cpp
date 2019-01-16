@@ -21,9 +21,10 @@ int main()
     return(0);
   }
   	
-  	c='L';
+  	c='K';
 	RS232_cputs(cport_nr,&c);
-	waitKey(10000);
+	waitKey(0);
+	printf("fffff\n");
 	//c='S';
 	//RS232_cputs(cport_nr,&c);
 	//waitKey(100);
