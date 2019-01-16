@@ -7,12 +7,52 @@
 #include<bits/stdc++.h>
 using namespace cv;
 using namespace std;
-Mat img=imread("see.png",(1));		
+Mat img=imread("background.png",(1));
+double variance(int x1,int x2,int x3) 
+{ 
+    // Compute mean (average of elements) 
+    float mean = (x1+x2+x3)/3;
+  	
+    // Compute sum squared  
+    // differences with mean. 
+    double sqDiff ;   
+        sqDiff = ((x1 - mean) * (x1 - mean))+((x2 - mean) * (x2 - mean))+((x2 - mean) * (x2 - mean)); 
+    return (sqDiff/3); 
+} 		
 int main()
 {
 	Mat img1(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img2(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
+	for(int i=0;i<img.rows;i++)
+		{
+			for(int j=0;j<img.cols;j++)
+			{
+				if(variance(img.at<Vec3b>(i,j)[0],img.at<Vec3b>(i,j)[1],img.at<Vec3b>(i,j)[2])>20)
+				{
+					img.at<Vec3b>(i,j)[0]=255;
+					img.at<Vec3b>(i,j)[1]=255;
+					img.at<Vec3b>(i,j)[2]=255;
+				}
+			}
+		}
+	for(int i=0;i<img.cols;i++)
+	{
+		for(int j=0;j<(img.rows)*(0.5);j++)
+		{
+			if((img.at<Vec3b>(j,i)[0]<80)&&(img.at<Vec3b>(j,i)[1]<80)&&(img.at<Vec3b>(j,i)[2]<80))
+			{
+				for(int k=j;k>=0;k--)
+				{
+					img.at<Vec3b>(k,i)[0]=0;
+					img.at<Vec3b>(k,i)[1]=0;
+					img.at<Vec3b>(k,i)[2]=0;
+				}
+				break;
+			}
+		}
+	}
+	imshow("colour",img);
 	for(int i=0;i<img.rows;i++)
 		{
 			for(int j=0;j<img.cols;j++)
@@ -24,12 +64,12 @@ Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
 		{
 			for(int j=0;j<img.cols;j++)
 			{
-				if(img1.at<uchar>(i,j)>50)
+				if(img1.at<uchar>(i,j)>70)
 					img1.at<uchar>(i,j)=255;
 			}
 		}
 	imshow("grey",img1);
-	Canny(img1,img2,25,25*3,3);      //Threshold value(255) determined by inspection 
+	Canny(img1,img2,255,255*3,3);      //Threshold value(255) determined by inspection 
 	imshow("canny",img2);
 	vector<Vec4i>lines;
 	HoughLinesP(img2, lines, 1, CV_PI/180, 100, 50, 10 );

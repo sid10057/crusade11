@@ -70,9 +70,18 @@ void dilation(Mat *img3,Mat *img4)
 		}
 	}
 }
+/*All the thresholds:
+1. Thresholds for segmentation of LED colour
+2. pix_thresh: the threshold for how many white pixels there have to be there in segmented image for the LED to come close enough
+3. threshold angle for horizon in lines=1,2 and 3 cases
+4. end of the code waitKey according to the timne the bot will take to turn a given quanta angle    */
+int flag=0, a=0,low_red,high_red,low_blue,high_blue,low_green,high_green,pix_red,pix_green,pix_blue,pix_thresh;       
+/*flag gives tells whether there is LED or no. a will give the status of number of LEDs detected. pix_colour gives a pixel value.
+pix_thresh gives the threshold pixel value above which we will consider bot to be close enough to LED. The other 2 variables are used to segment the LED*/
 VideoCapture vid(1);			
 int left_cnt=0;
 int right_cnt=0;
+int white_cnt=0;  
 int main()
 {
 	
@@ -104,6 +113,37 @@ int main()
 					img1.at<uchar>(i,j)=255;
 			}
 		}
+		//Segmentation of LED colour
+        for(int i=0;i<img_col.rows;d++)
+        {
+            for(int j=0;j<img_col.cols;e++)
+            {
+                pix_blue=img_col.at<Vec3b>(i,j)[0];
+                pix_green=img_col.at<Vec3b>(i,j)[1];
+                pix_red=img_col.at<Vec3b>(i,j)[2];
+                if(pix_blue<=high_blue && pix_blue>=low_blue && pix_green<=high_green && pix_green>=low_green && pix_red<=high_red && pix_red>=low_red)
+                {
+                    seg.at<uchar>(i,j)=255;
+                    white_cnt++;
+                }
+            }
+        }
+        if(white_cnt>=pix_thresh)
+        {
+            if(flag==0)
+                a++;
+            flag=1;
+        }
+        if(flag==1 && white_cnt==0)            //white_cnt should be 0 or  less than some min threshold
+        {
+            if(RS232_OpenComport(cport_nr,bdrate,mode))        //check if port is open
+                continue;
+            c='S';
+            RS232_cputs(cport_nr,&c);
+            c='K'
+            RS232_cputs(cport_nr,&c);
+            flag=0;
+        }
 		erosion(&img1,&img_temp);
 		dilation(&img_temp,&img1);
 		Canny(img1,img2,255,255*3,3);      //Threshold value(255) determined by inspection 
@@ -255,7 +295,6 @@ int main()
 			else
 				j=1;
 			int i;
-			float theta 
 			if(finalang[j]>0)
 			{
 				c='R';
