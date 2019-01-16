@@ -6,6 +6,7 @@
 #include<math.h>
 #include<stdlib.h>
 #include<bits/stdc++.h>
+#include<unistd.h>
 using namespace cv;
 using namespace std;
 int main()
@@ -20,12 +21,27 @@ int main()
 
     return(0);
   }
-  	
-  	c='K';
+ int i=0;
+  	while(i++<5)
+  	{
+  		/* if(RS232_OpenComport(cport_nr, bdrate, mode))
+  		{
+   			 printf("Can not open comport\n");
+
+    		return(0);
+  		}*/
+  	usleep(2000000);	
+  	c='F';
 	RS232_cputs(cport_nr,&c);
-	waitKey(0);
+	usleep(2000000);
+	c='S';
+	RS232_cputs(cport_nr,&c);
+	usleep(1000000);
+	c='R';
+	RS232_cputs(cport_nr,&c);
+	usleep(1000000);
 	printf("fffff\n");
-	//c='S';
+	}//c='S';
 	//RS232_cputs(cport_nr,&c);
 	//waitKey(100);
 	return 0;
