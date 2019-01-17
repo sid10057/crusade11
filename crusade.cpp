@@ -17,7 +17,8 @@ using namespace std;
 5. Threshold for white_cnt in 2nd if statement
 6. x is the time taken to move one quanta angle
 7. Threshold for Canny and HoughLinesP
-8. Set quanta    */
+8. Set quanta
+9. Check line no. 387   */
 int flag=0, a=0,low_red,high_red,low_blue,high_blue,low_green,high_green,pix_red,pix_green,pix_blue,pix_thresh;       
 /*flag gives tells whether there is LED or no. a will give the status of number of LEDs detected. pix_colour gives a pixel value.
 pix_thresh gives the threshold pixel value above which we will consider bot to be close enough to LED. The other 2 variables are used to segment the LED*/
@@ -95,31 +96,28 @@ void dilation(Mat *img3,Mat *img4)
         }
     }
 }
-VideoCapture vid("test.webm");           
+VideoCapture vid(0);           
 int left_cnt=0;
 int right_cnt=0;
 int main()
 {
-   
+   	//printf("aaaaaaa\n");
     int cport_nr=24;   /* /dev/ttyACM0 (COM1 on windows) */
     int bdrate=9600;       /* 9600 baud */
+    char c, mode[]={'8','N','1',0};
+    if(RS232_OpenComport(cport_nr, bdrate, mode))
+  	{
+    	printf("Can not open comport\n");
+		return(0);
+  	}
 
-    
-      char c, mode[]={'8','N','1',0};
-      if(RS232_OpenComport(cport_nr, bdrate, mode))
-  {
-    printf("Can not open comport\n");
 
-    return(0);
-  }
     while(1)
     {
 
         int white_cnt=0;        //number of white pixels in segmented image
         Mat img_col;        //coloured image used to detect LED
         vid>>img_col;
-        if(img_col.empty())
-		break;
         Mat img1(img_col.rows,img_col.cols,CV_8UC1,Scalar(0));        //greyscale image used for path detection
         Mat img_temp(img1.rows,img1.cols,CV_8UC1,Scalar(0));        //temporary image used for erosion dialation
         Mat img2(img1.rows,img1.cols,CV_8UC1,Scalar(0));        //used for canny
@@ -162,7 +160,7 @@ int main()
             flag=0;
         }*/
         int i;int x=0;
-for( i=img_col.rows-1;i>=0;i--)
+		/*for( i=img_col.rows-1;i>=0;i--)
 		{
 			int flag=1;
 			for(int j=0;j<img_col.cols;j++)
@@ -180,17 +178,17 @@ for( i=img_col.rows-1;i>=0;i--)
 				break;
 			}
 		}
-	for( ;i>=0;i--)
-	{
-		for(int j=0;j<img_col.cols;j++)
+		for( ;i>=0;i--)
 		{
-			img_col.at<Vec3b>(i,j)[0]=x/img_col.cols;
-			img_col.at<Vec3b>(i,j)[1]=x/img_col.cols;
-			img_col.at<Vec3b>(i,j)[2]=x/img_col.cols;
-		}
-	}	
-	namedWindow("colour",WINDOW_NORMAL);
-        imshow("colour",img_col);
+			for(int j=0;j<img_col.cols;j++)
+			{
+				img_col.at<Vec3b>(i,j)[0]=x/img_col.cols;
+				img_col.at<Vec3b>(i,j)[1]=x/img_col.cols;
+				img_col.at<Vec3b>(i,j)[2]=x/img_col.cols;
+			}
+		}*/	
+		//namedWindow("colour",WINDOW_NORMAL);
+      	//  imshow("colour",img_col);
 		//greyscale conversion
         for(int i=0;i<img_col.rows;i++)
         {
@@ -210,10 +208,11 @@ for( i=img_col.rows-1;i>=0;i--)
         erosion(&img1,&img_temp);
         dilation(&img_temp,&img1);
         Canny(img1,img2,25,25*3,3);      //Threshold value(255) determined by inspection
-      //  namedWindow("canny",WINDOW_NORMAL);
-       // imshow("canny",img2);
+        //namedWindow("canny",WINDOW_NORMAL);
+       	// imshow("canny",img2);
         vector<Vec4i>lines;
-        HoughLinesP(img2, lines, 1, CV_PI/180, 50, 50, 10 );
+        HoughLinesP(img2, lines, 1, CV_PI/180, 50, 40, 10 );
+            //if(lines[i][1]!=lines[i][3])s, 1, CV_PI/180, 50, 50, 10 );
         vector<float>length;
         vector<float>ang;                 //storing all angles in one vector array 'angle'
         vector<float>finalang;                //stores the final angles
@@ -222,15 +221,15 @@ for( i=img_col.rows-1;i>=0;i--)
         {
             line(img3,Point(lines[i][0],lines[i][1]),Point(lines[i][2],lines[i][3]), Scalar(255), 1, LINE_4);
             length.push_back((float)(sqrt((lines[i][0]-lines[i][2])*(lines[i][0]-lines[i][2])+(lines[i][1]-lines[i][3])*(lines[i][1]-lines[i][3]))));
-            if(lines[i][1]!=lines[i][3])
+            //if(lines[i][1]!=lines[i][3])
                 ang.push_back((float)((atan(((float)(lines[i][1]-lines[i][3])/(lines[i][2]-lines[i][0]))))*180/3.14));
         }
         int *arr;
         arr=(int *)malloc((lines.size())*(sizeof(int)));
         for(int i=0;i<ang.size();i++)
             arr[i]=0;
-        //namedWindow("hough",WINDOW_NORMAL);
-        //imshow("hough",img3);
+        namedWindow("hough",WINDOW_NORMAL);
+        imshow("hough",img3);
         vector<float>::iterator ptr;
         //condition for no lines detected
         if(ang.size()==0)
@@ -282,16 +281,16 @@ for( i=img_col.rows-1;i>=0;i--)
             if((finalang[2]>0)&&(j!=2))
                 i=2;
            
-            if(abs(finalang[j])<15)                        //15 is threshold
-            {
+            //if(abs(finalang[j])<15)                        //15 is threshold
+            //{
                 if(finallen[0]>finallen[2])
                     right_cnt++;
                 else
                     left_cnt++;
                 c='F';
                 RS232_cputs(cport_nr,&c);
-                usleep(300000);
-            }
+                usleep(1000000);
+            //}
         }
         //we have to find logic for another case
         else if(finalang.size()==1)                                    //rotate the bot along the seen edge
@@ -322,8 +321,6 @@ for( i=img_col.rows-1;i>=0;i--)
                  }
                  else
                  {
-                     if(right_cnt>left_cnt)
-                     {
                        /*  if(RS232_OpenComport(cport_nr,bdrate,mode))        //check if port is open
                          {
                             cout<<"Port not open";
@@ -336,7 +333,6 @@ for( i=img_col.rows-1;i>=0;i--)
                              RS232_cputs(cport_nr,&c);
                              usleep(300000);           
                          }
-                     }
                  }
                  left_cnt=0;
                  right_cnt=0;
@@ -350,13 +346,10 @@ for( i=img_col.rows-1;i>=0;i--)
                         cout<<"Port not open";
                         continue;
                     }*/
-                    int turn=(int)(finalang[0]/quanta);        //turn given the number of times the bot has to do the command to complete rotation by that angle
-                     c='R';
-                     for(int i=0;i<turn;i++)
-                     {
-                         RS232_cputs(cport_nr,&c);
-                         usleep(300000);   
-                     }
+                           //turn given the number of times the bot has to do the command to complete rotation by that angle
+                    c='R';
+                    RS232_cputs(cport_nr,&c);
+                    usleep(300000);   
                  }
                  else
                  {
@@ -365,13 +358,9 @@ for( i=img_col.rows-1;i>=0;i--)
                         cout<<"Port not open";
                         continue;
                     }*/
-                    int turn=(int)(abs(finalang[0]/quanta));        //turn given the number of times the bot has to do the command to complete rotation by that angle
                      c='L';
-                     for(int i=0;i<turn;i++)
-                     {
-                         RS232_cputs(cport_nr,&c);
-                         usleep(300000);   
-                     }
+               	     RS232_cputs(cport_nr,&c);
+                    usleep(300000);   
                  }   
 
             }
@@ -395,7 +384,7 @@ for( i=img_col.rows-1;i>=0;i--)
             {
                 c='R';
                 RS232_cputs(cport_nr,&c);
-                usleep(300000);   
+                usleep(300000);   					//to be decided how many times this quanta is to be given
                 RS232_cputs(cport_nr,&c);
                 usleep(300000);   
             }
@@ -407,13 +396,12 @@ for( i=img_col.rows-1;i>=0;i--)
                 RS232_cputs(cport_nr,&c);
                 usleep(300000);   
             }   
-         } 
-        usleep(250000);       //tbd
+        } 
+        usleep(500000);       //tbd
     }
-    vid.release();
-destroyAllWindows();
-    return 0;
+	return 0;
 }
+
 	
 	
 	

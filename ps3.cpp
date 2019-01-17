@@ -7,7 +7,8 @@
 #include<bits/stdc++.h>
 using namespace cv;
 using namespace std;
-Mat img=imread("background.png",(1));
+
+Mat img=imread("test3.jpg");
 double variance(int x1,int x2,int x3) 
 { 
     // Compute mean (average of elements) 
@@ -24,44 +25,34 @@ int main()
 	Mat img1(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img2(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
-	for(int i=0;i<img.rows;i++)
+	 int i;int x=0;
+/*for( i=img.rows-1;i>=0;i--)
 		{
+			int flag=1;
 			for(int j=0;j<img.cols;j++)
 			{
-				if(variance(img.at<Vec3b>(i,j)[0],img.at<Vec3b>(i,j)[1],img.at<Vec3b>(i,j)[2])>20)
-				{
-					img.at<Vec3b>(i,j)[0]=0;
-					img.at<Vec3b>(i,j)[1]=0;
-					img.at<Vec3b>(i,j)[2]=0;
-				}
-			} 
-		}
-	for(int i=0;i<img.cols;i++)
-	{
-		for(int j=0;j<(img.rows)*(0.5);j++)
-		{
-			if((img.at<Vec3b>(j,i)[0]<80)&&(img.at<Vec3b>(j,i)[1]<80)&&(img.at<Vec3b>(j,i)[2]<80))
+				if(!((img.at<Vec3b>(i,j)[0]<110)&&(img.at<Vec3b>(i,j)[0]<110)&&(img.at<Vec3b>(i,j)[0]<110)&&(variance(img.at<Vec3b>(i,j)[0],img.at<Vec3b>(i,j)[1],img.at<Vec3b>(i,j)[2])<10)))
+					flag=0;		
+			}
+			if(flag==1)
 			{
-				for(int k=j;k>=0;k--)
+				for(int k=0;k<img.cols;k++)
 				{
-					img.at<Vec3b>(k,i)[0]=0;
-					img.at<Vec3b>(k,i)[1]=0;
-					img.at<Vec3b>(k,i)[2]=0;
-				}
+					if(img.at<Vec3b>(i,k)[0]>x)
+						x=x+img.at<Vec3b>(i,k)[0];
+				}	
 				break;
 			}
 		}
-	}
-	for(int i=0;i<img.rows;i++)
+	for( ;i>=0;i--)
+	{
+		for(int j=0;j<img.cols;j++)
 		{
-			for(int j=0;j<img.cols;j++)
-			{
-				if((variance(img.at<Vec3b>(i,j)[0],img.at<Vec3b>(i,j)[1],img.at<Vec3b>(i,j)[2])>20)&&(img.at<Vec3b>(i,j)[0]>50))
-				{
-					h
-				}
-			}
+			img.at<Vec3b>(i,j)[0]=x/img.cols;
+			img.at<Vec3b>(i,j)[1]=x/img.cols;
+			img.at<Vec3b>(i,j)[2]=x/img.cols;
 		}
+	}*/	
 	imshow("colour",img);
 	for(int i=0;i<img.rows;i++)
 		{
@@ -84,7 +75,7 @@ Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
 	Canny(img1,img2,25,25*3,3);      //Threshold value(255) determined by inspection 
 	imshow("canny",img2);
 	vector<Vec4i>lines;
-	HoughLinesP(img2, lines, 1, CV_PI/180, 100, 50, 10 );
+	HoughLinesP(img2, lines, 1, CV_PI/180, 50, 40, 10 );
 	vector<float>distance;
 	vector<float>ang;                 //storing all angles in one vector array 'angle'
 	vector<float>finalang;

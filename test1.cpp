@@ -7,7 +7,7 @@
 #include<bits/stdc++.h>
 using namespace cv;
 using namespace std;
-VideoCapture vid("test.webm");
+VideoCapture vid(1);
 Mat img;
 double variance(int x1,int x2,int x3) 
 { 
@@ -25,13 +25,11 @@ int main()
 	while(1)
 	{
 	vid>>img;
-	if(img.empty())
-		break;
 	Mat img1(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img2(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
 int i;int x=0;
-for( i=img.rows-1;i>=0;i--)
+/*for( i=img.rows-1;i>=0;i--)
 		{
 			int flag=1;
 			for(int j=0;j<img.cols;j++)
@@ -57,9 +55,9 @@ for( i=img.rows-1;i>=0;i--)
 			img.at<Vec3b>(i,j)[1]=x/img.cols;
 			img.at<Vec3b>(i,j)[2]=x/img.cols;
 		}
-	}	
-	namedWindow("colour",WINDOW_NORMAL);
-	imshow("colour",img);
+	}*/	
+	//namedWindow("colour",WINDOW_NORMAL);
+	//imshow("colour",img);
 	for(int i=0;i<img.rows;i++)
 		{
 			for(int j=0;j<img.cols;j++)
@@ -172,8 +170,6 @@ for( i=img.rows-1;i>=0;i--)
 	}*/
 	waitKey(250);
 }
-vid.release();
-destroyAllWindows();
 return 0;
 }
        

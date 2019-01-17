@@ -10,11 +10,11 @@ int pwm1 = 9;
 int pwm2 = 10;
 int LED = 12;
 
-void left()
+void backward()
 {
-  Serial.println("Motion Left");
-  analogWrite(pwm1, 80);
-  analogWrite(pwm2, 82);
+  Serial.println("Motion Backward");
+  analogWrite(pwm1, 100);
+  analogWrite(pwm2,103);
   digitalWrite(motorA2, LOW);
   digitalWrite(motorA1, HIGH);
 
@@ -24,11 +24,11 @@ void left()
 
 
 }
-void right()
+void forward()
 {
-  Serial.println("Motion Rightt");
-  analogWrite(pwm1, 80);
-  analogWrite(pwm2, 82);
+  Serial.println("Motion Forward");
+  analogWrite(pwm1, 100);
+  analogWrite(pwm2, 103);
   digitalWrite(motorA1, LOW);
   digitalWrite(motorA2, HIGH);
 
@@ -49,9 +49,9 @@ void ledblink()
  
 }
 
-void backward()
+void left()
 {
-  Serial.println("Motion Backward");
+  Serial.println("Motion Left");
   analogWrite(pwm1, 80);
   analogWrite(pwm2, 82);
   digitalWrite(motorA2, LOW);
@@ -63,9 +63,9 @@ void backward()
 
 
 }
-void forward()
+void right()
 {
-  Serial.println("Motion Forward");
+  Serial.println("Motion Right");
 
 
   analogWrite(pwm1, 80);
@@ -76,17 +76,7 @@ void forward()
   digitalWrite(motorB1, LOW);
   digitalWrite(motorB2, HIGH);
 }
-//void forward()
-//{
-//    Serial.println("Motion Backward");
-//  analogWrite(pwm1, 80);
-//  analogWrite(pwm2, 82);
-//  digitalWrite(motorA2, LOW);
-//  digitalWrite(motorA1, HIGH);
-//
-//  digitalWrite(motorB1, HIGH);
-//  digitalWrite(motorB2, LOW);
-//}
+
 void stope()
 {
   Serial.println("Stop");
@@ -97,7 +87,7 @@ void stope()
 
   digitalWrite(motorB1, LOW);
   digitalWrite(motorB2, LOW);
-  delay(3000);
+ // delay(3000);
 }
 
 
@@ -132,8 +122,8 @@ void loop()
 
       forward();
       Serial.println("Forward");
-    delay(1000);
-      stope();
+   /* delay(1000);
+      stope();*/
     }
 
 
@@ -142,8 +132,8 @@ void loop()
     else if (i == 'B')
     {
       backward();
-     delay(1000);
-      stope();
+   /* delay(1000);
+      stope();*/
     }
 
     else if (i == 'L')
