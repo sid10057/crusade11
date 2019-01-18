@@ -122,8 +122,8 @@ void loop()
 
       forward();
       Serial.println("Forward");
-   /* delay(1000);
-      stope();*/
+    delay(1000);
+      //stope();
     }
 
 

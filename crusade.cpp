@@ -187,8 +187,8 @@ int main()
 				img_col.at<Vec3b>(i,j)[2]=x/img_col.cols;
 			}
 		}*/	
-		namedWindow("colour",WINDOW_NORMAL);
-      	 imshow("colour",img_col);
+		//namedWindow("colour",WINDOW_NORMAL);
+      	 //imshow("colour",img_col);
 		//greyscale conversion
         for(int i=0;i<img_col.rows;i++)
         {
@@ -235,7 +235,6 @@ int main()
         if(ang.size()==0)
         {
             printf("no line\n");
-            continue;
         }
         for(int i=0;i<ang.size();i++)
         {
@@ -266,12 +265,15 @@ int main()
         cout<<endl;
         if(finalang.size()==0)
         {
+
+             c='S';
+            RS232_cputs(cport_nr,&c);
              c='B';
             RS232_cputs(cport_nr,&c);
             printf("Backward 0\n");
             usleep(500000);
         }
-        if(finalang.size()==3)
+        else if(finalang.size()>=3)
         {
             //if(RS232_OpenComport(cport_nr,bdrate,mode))        //check if port is open
               //  continue;

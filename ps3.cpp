@@ -8,7 +8,7 @@
 using namespace cv;
 using namespace std;
 
-Mat img=imread("test3.jpg");
+Mat img=imread("88.jpg");
 double variance(int x1,int x2,int x3) 
 { 
     // Compute mean (average of elements) 
@@ -75,21 +75,18 @@ Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
 	Canny(img1,img2,25,25*3,3);      //Threshold value(255) determined by inspection 
 	imshow("canny",img2);
 	vector<Vec4i>lines;
-	HoughLinesP(img2, lines, 1, CV_PI/180, 50, 40, 10 );
-	vector<float>distance;
-	vector<float>ang;                 //storing all angles in one vector array 'angle'
-	vector<float>finalang;
-	if(lines.size()==0)
-	{
-		printf("lines=0\n");
-		waitKey(0);
-	}
-	for(int i=0;i<lines.size();i++)
-	{
-		line(img3,Point(lines[i][0],lines[i][1]),Point(lines[i][2],lines[i][3]), Scalar(255), 1, LINE_4);
-		cout<<lines[i][0]<<" "<<lines[i][1]<<" "<<lines[i][2]<<" "<<lines[i][3]<<endl;
-		ang.push_back((float)((atan(((float)(lines[i][1]-lines[i][3])/(lines[i][2]-lines[i][0]))))*180/3.14));
-	}
+	HoughLinesP(img2, lines, 1, CV_PI/180, 50, 50, 10 );
+	vector<float>length;
+        vector<float>ang;                 //storing all angles in one vector array 'angle'
+        vector<float>finalang;                //stores the final angles
+        vector<float>finallen;
+        for(int i=0;i<lines.size();i++)
+        {
+            line(img3,Point(lines[i][0],lines[i][1]),Point(lines[i][2],lines[i][3]), Scalar(255), 1, LINE_4);
+            length.push_back((float)(sqrt((lines[i][0]-lines[i][2])*(lines[i][0]-lines[i][2])+(lines[i][1]-lines[i][3])*(lines[i][1]-lines[i][3]))));
+            //if(lines[i][1]!=lines[i][3])
+                ang.push_back((float)((atan(((float)(lines[i][1]-lines[i][3])/(lines[i][2]-lines[i][0]))))*180/3.14));
+        }
 	int *arr;
 	arr=(int *)malloc((lines.size())*(sizeof(int)));
 	for(int i=0;i<ang.size();i++)
@@ -100,25 +97,38 @@ Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
 	{
 		float x=(*(ang.begin()+i));
 		float sum=0;
+		float sum2=0;
 		int count=0;
 		for(int p=i;p<ang.size();p++)
 		{
 			if((abs((*(ang.begin()+p))-x)<=5)&&(arr[p]==0))	//the final angle array will contain only "really" distinct lines
 			{
-				sum=sum+(*(ang.begin()+p));					//5 is threshold of angle, determined by inspection
+				sum=sum+(*(ang.begin()+p));	
+				sum2=sum2+(*(length.begin()+p));				//5 is threshold of angle, determined by inspection
 				arr[p]=1;
 				count++;
 			}	
 		}
-		if(count>0)finalang.push_back(sum/count);
+		if(count>0)
+		{
+			
+                    finalang.push_back(sum/count);
+                    finallen.push_back(sum2);
+                
+		}
 	}
 	sort(finalang.begin(),finalang.end());
-	for(ptr=ang.begin();ptr!=ang.end();ptr++)
+	/*for(ptr=ang.begin();ptr!=ang.end();ptr++)
+	{
+		cout<<*ptr<<" ";
+	}*/
+	cout<<endl;
+	for(ptr=finalang.begin();ptr!=finalang.end();ptr++)
 	{
 		cout<<*ptr<<" ";
 	}
 	cout<<endl;
-	for(ptr=finalang.begin();ptr!=finalang.end();ptr++)
+	for(ptr=finallen.begin();ptr!=finallen.end();ptr++)
 	{
 		cout<<*ptr<<" ";
 	}
