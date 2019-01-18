@@ -96,7 +96,7 @@ void dilation(Mat *img3,Mat *img4)
         }
     }
 }
-VideoCapture vid(0);           
+VideoCapture vid(1);           
 int left_cnt=0;
 int right_cnt=0;
 int main()
@@ -187,8 +187,8 @@ int main()
 				img_col.at<Vec3b>(i,j)[2]=x/img_col.cols;
 			}
 		}*/	
-		//namedWindow("colour",WINDOW_NORMAL);
-      	//  imshow("colour",img_col);
+		namedWindow("colour",WINDOW_NORMAL);
+      	 imshow("colour",img_col);
 		//greyscale conversion
         for(int i=0;i<img_col.rows;i++)
         {
@@ -211,7 +211,7 @@ int main()
         //namedWindow("canny",WINDOW_NORMAL);
        	// imshow("canny",img2);
         vector<Vec4i>lines;
-        HoughLinesP(img2, lines, 1, CV_PI/180, 50, 40, 10 );
+        HoughLinesP(img2, lines, 1, CV_PI/180, 50, 50, 10 );
             //if(lines[i][1]!=lines[i][3])s, 1, CV_PI/180, 50, 50, 10 );
         vector<float>length;
         vector<float>ang;                 //storing all angles in one vector array 'angle'
@@ -228,8 +228,8 @@ int main()
         arr=(int *)malloc((lines.size())*(sizeof(int)));
         for(int i=0;i<ang.size();i++)
             arr[i]=0;
-        namedWindow("hough",WINDOW_NORMAL);
-        imshow("hough",img3);
+       // namedWindow("hough",WINDOW_NORMAL);
+        //imshow("hough",img3);
         vector<float>::iterator ptr;
         //condition for no lines detected
         if(ang.size()==0)
@@ -264,6 +264,13 @@ int main()
             cout<<*ptr<<" ";
         }
         cout<<endl;
+        if(finalang.size()==0)
+        {
+             c='B';
+            RS232_cputs(cport_nr,&c);
+            printf("Backward 0\n");
+            usleep(500000);
+        }
         if(finalang.size()==3)
         {
             //if(RS232_OpenComport(cport_nr,bdrate,mode))        //check if port is open
@@ -289,6 +296,7 @@ int main()
                     left_cnt++;
                 c='F';
                 RS232_cputs(cport_nr,&c);
+                printf("Forward 3\n");
                 usleep(1000000);
             //}
         }
@@ -302,7 +310,7 @@ int main()
             }*/
             c='S';
              RS232_cputs(cport_nr,&c);   
-             if(abs(finalang[0])<10)        //threshold for horizon
+             if(abs(finalang[0])<5)        //threshold for horizon
              {
                  if(right_cnt>left_cnt)
                  {
@@ -313,9 +321,10 @@ int main()
                     }*/
                     int turn=(int)(90/quanta);        //turn given the number of times the bot has to do the command to complete rotation by that angle
                      c='R';
-                     for(int i=0;i<turn;i++)
+                     for(int i=0;i<turn-1;i++)
                      {
-                         RS232_cputs(cport_nr,&c);   
+                         RS232_cputs(cport_nr,&c);
+                          printf("Right 1\n");   
                          usleep(300000);   
                      }
                  }
@@ -328,9 +337,10 @@ int main()
                         }*/
                         int turn=(int)(90/quanta);        //turn given the number of times the bot has to do the command to complete rotation by that angle
                          c='L';
-                         for(int i=0;i<turn;i++)
+                         for(int i=0;i<turn-1;i++)
                          {
                              RS232_cputs(cport_nr,&c);
+                              printf("Left 1\n");
                              usleep(300000);           
                          }
                  }
@@ -349,6 +359,7 @@ int main()
                            //turn given the number of times the bot has to do the command to complete rotation by that angle
                     c='R';
                     RS232_cputs(cport_nr,&c);
+                     printf("Right 1\n");
                     usleep(300000);   
                  }
                  else
@@ -360,6 +371,7 @@ int main()
                     }*/
                      c='L';
                	     RS232_cputs(cport_nr,&c);
+                      printf("Left 1\n");
                     usleep(300000);   
                  }   
 
@@ -380,25 +392,39 @@ int main()
                 j=0;
             else
                 j=1;
-            if(finalang[j]>0)
+            if(finallen[j]<300)
             {
-                c='R';
-                RS232_cputs(cport_nr,&c);
-                usleep(300000);   					//to be decided how many times this quanta is to be given
-                RS232_cputs(cport_nr,&c);
-                usleep(300000);   
+                if(finalang[j]>0)
+                {
+                    c='R';
+                    RS232_cputs(cport_nr,&c);
+                     printf("Right 2\n");
+                    usleep(300000);   					//to be decided how many times this quanta is to be given
+                    RS232_cputs(cport_nr,&c);
+                     printf("Right 2\n");
+                    usleep(300000);   
+                }
+                else
+                {
+                    c='L';
+                    RS232_cputs(cport_nr,&c);
+                     printf("Left 2\n");
+                    usleep(300000);   
+                    RS232_cputs(cport_nr,&c);
+                     printf("Left 2\n");
+                    usleep(300000);   
+                }   
             }
             else
             {
-                c='L';
-                RS232_cputs(cport_nr,&c);
-                usleep(300000);   
-                RS232_cputs(cport_nr,&c);
-                usleep(300000);   
-            }   
-        } 
+                    c='F';
+                    RS232_cputs(cport_nr,&c);
+                     printf("Forward 2\n");
+                    usleep(500000); 
+            }
+        }
         usleep(500000);       //tbd
-    }
+     }
 	return 0;
 }
 

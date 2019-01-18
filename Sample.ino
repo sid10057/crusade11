@@ -52,8 +52,8 @@ void ledblink()
 void left()
 {
   Serial.println("Motion Left");
-  analogWrite(pwm1, 80);
-  analogWrite(pwm2, 82);
+  analogWrite(pwm1, 100);
+  analogWrite(pwm2, 103);
   digitalWrite(motorA2, LOW);
   digitalWrite(motorA1, HIGH);
 
@@ -68,8 +68,8 @@ void right()
   Serial.println("Motion Right");
 
 
-  analogWrite(pwm1, 80);
-  analogWrite(pwm2, 82);
+  analogWrite(pwm1, 100);
+  analogWrite(pwm2, 103);
   digitalWrite(motorA1, LOW);
   digitalWrite(motorA2, HIGH);
 
@@ -132,9 +132,9 @@ void loop()
     else if (i == 'B')
     {
       backward();
-   /* delay(1000);
-      stope();*/
-    }
+    delay(500);
+      stope();
+    } 
 
     else if (i == 'L')
     {

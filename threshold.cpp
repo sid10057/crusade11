@@ -7,24 +7,24 @@
 #include<bits/stdc++.h>
 using namespace cv;
 using namespace std;
-Mat img=imread("test4.jpg",1);
-Mat img2(img.rows,img.cols,CV_8UC1,Scalar(0));
+Mat img=imread("test5.jpg"); 
+ Mat img2(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img1(img.rows,img.cols,CV_8UC1,Scalar(0));
-
 vector<Vec4i>lines;
 vector<float>distance;
 vector<float>ang;                 //storing all angles in one vector array 'angle'
 vector<float>finalang;
-int th_canny=250, th_hough_thrdlast=50, th_hough_last=50;
+int th_canny, th_hough_thrdlast, th_hough_seclast;
 void callback_canny(int tl_can, void *c)
 {
+   
     Canny(img1,img2,tl_can,tl_can*3,3);     
     imshow("Canny Thresh",img2);
 }
 void callback_hough(int t,void *c)
 {
     Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
-    HoughLinesP(img2, lines, 1, CV_PI/180, th_hough_thrdlast, 50, th_hough_last);
+    HoughLinesP(img2, lines, 1, CV_PI/180, th_hough_thrdlast, th_hough_seclast, 10);
     for(int i=0;i<lines.size();i++)
     {
         line(img3,Point(lines[i][0],lines[i][1]),Point(lines[i][2],lines[i][3]), Scalar(255), 1, LINE_4);
@@ -56,7 +56,7 @@ int main()
     createTrackbar("Canny","Canny Thresh",&th_canny,300,callback_canny);
     namedWindow("Houghlines",WINDOW_NORMAL);
     createTrackbar("Third Last","Houghlines",&th_hough_thrdlast,150,callback_hough);
-    createTrackbar("Last","Houghlines",&th_hough_thrdlast,150,callback_hough);
+    createTrackbar("Second Last","Houghlines",&th_hough_seclast,150,callback_hough);
     waitKey(0);
     return 0;
 }
