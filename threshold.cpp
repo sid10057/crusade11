@@ -7,56 +7,40 @@
 #include<bits/stdc++.h>
 using namespace cv;
 using namespace std;
-Mat img=imread("1.jpg"); 
+Mat img=imread("con1.jpg"); 
+double PI = 3.1426;
  Mat img2(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img1(img.rows,img.cols,CV_8UC1,Scalar(0));
-vector<Vec4i>lines;
-vector<float>distance;
-vector<float>ang;                 //storing all angles in one vector array 'angle'
-vector<float>finalang;
-int th_canny, th_hough_thrdlast, th_hough_seclast;
-void callback_canny(int tl_can, void *c)
-{
-   
-    Canny(img1,img2,tl_can,tl_can*3,3);     
-    imshow("Canny Thresh",img2);
-}
-void callback_hough(int t,void *c)
-{
-    Mat img3(img.rows,img.cols,CV_8UC1,Scalar(0));
-    HoughLinesP(img2, lines, 1, CV_PI/180, th_hough_thrdlast, th_hough_seclast, 10);
-    for(int i=0;i<lines.size();i++)
-    {
-        line(img3,Point(lines[i][0],lines[i][1]),Point(lines[i][2],lines[i][3]), Scalar(255), 1, LINE_4);
-        if(lines[i][1]!=lines[i][3])
-            ang.push_back((float)((atan(((float)(lines[i][1]-lines[i][3])/(lines[i][2]-lines[i][0]))))*180/3.14));
-    }
-    imshow("Houghlines", img3);
-}       
+double thresh = 10000;
 int main()
 {
-    namedWindow("colour",WINDOW_NORMAL);
-    imshow("colour",img);
-    for(int i=0;i<img.rows;i++)
-    {
-        for(int j=0;j<img.cols;j++)
-            img1.at<uchar>(i,j)=(int)(0.21*img.at<Vec3b>(i,j)[2]+0.72*img.at<Vec3b>(i,j)[1]+0.07*img.at<Vec3b>(i,j)[0]);
-    }
-    /*for(int i=0;i<img.rows;i++)
-    {
-        for(int j=0;j<img.cols;j++)
+    vector<vector<Point> > contours1;
+        vector<Vec4i> hierarchy;
+         double tan,theta,thetad;
+        namedWindow("win1",WINDOW_NORMAL);
+        findContours(img,contours1,hierarchy,CV_RETR_TREE,CV_CHAIN_APPROX_SIMPLE,Point(0,0));
+        Mat drawing1=Mat::zeros(img1.size(),CV_8UC3);
+           for( int i = 0; i< contours1.size(); i++ )
+            {
+                Scalar color( 255, 255 , 255 );
+                drawContours(drawing1, contours1, i, color, 2, 8, hierarchy, 0, Point() );
+            }
+        imshow("win1",drawing1);
+        Mat grey1,binary1;
+        cvtColor( drawing1, grey1, COLOR_BGR2GRAY );
+        threshold( grey1, binary1, 50,255,THRESH_BINARY );
+        Moments m1 = moments(binary1,true);
+        int cx1=m1.m10/m1.m00;
+        int cy1=m1.m01/m1.m00;
+        tan=(double)2*(binary1.cols/2-cx1)/binary1.rows;
+        theta=atan(tan);
+        thetad=theta*180/PI;
+        float area=0 ;
+        for (unsigned int i = 0;  i < contours1.size();  i++)
         {
-            if(img1.at<uchar>(i,j)>50)
-                img1.at<uchar>(i,j)=255;
-            else
-                img1.at<uchar>(i,j)=0;
-        }
-    }*/
-    namedWindow("Canny Thresh",WINDOW_NORMAL);
-    createTrackbar("Canny","Canny Thresh",&th_canny,300,callback_canny);
-    namedWindow("Houghlines",WINDOW_NORMAL);
-    createTrackbar("Third Last","Houghlines",&th_hough_thrdlast,150,callback_hough);
-    createTrackbar("Second Last","Houghlines",&th_hough_seclast,150,callback_hough);
-    waitKey(0);
-    return 0;
+            area =  area+contourArea(contours1[i]); 
+            printf("%f",area);
+        } 
+        waitKey(0);
+        return 0;
 }
