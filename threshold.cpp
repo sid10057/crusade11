@@ -7,7 +7,7 @@
 #include<bits/stdc++.h>
 using namespace cv;
 using namespace std;
-Mat img=imread("test5.jpg"); 
+Mat img=imread("1.jpg"); 
  Mat img2(img.rows,img.cols,CV_8UC1,Scalar(0));
 Mat img1(img.rows,img.cols,CV_8UC1,Scalar(0));
 vector<Vec4i>lines;
@@ -42,7 +42,7 @@ int main()
         for(int j=0;j<img.cols;j++)
             img1.at<uchar>(i,j)=(int)(0.21*img.at<Vec3b>(i,j)[2]+0.72*img.at<Vec3b>(i,j)[1]+0.07*img.at<Vec3b>(i,j)[0]);
     }
-    for(int i=0;i<img.rows;i++)
+    /*for(int i=0;i<img.rows;i++)
     {
         for(int j=0;j<img.cols;j++)
         {
@@ -51,7 +51,7 @@ int main()
             else
                 img1.at<uchar>(i,j)=0;
         }
-    }
+    }*/
     namedWindow("Canny Thresh",WINDOW_NORMAL);
     createTrackbar("Canny","Canny Thresh",&th_canny,300,callback_canny);
     namedWindow("Houghlines",WINDOW_NORMAL);

@@ -121,9 +121,9 @@ void loop()
     {
 
       forward();
-      Serial.println("Forward");
-    delay(1000);
-      //stope();
+     // Serial.println("Forward");
+   //delay(1000);
+     //stope();
     }
 
 
@@ -131,8 +131,8 @@ void loop()
 
     else if (i == 'B')
     {
-      backward();
-    delay(500);
+    backward();
+    delay(100);
       stope();
     } 
 
@@ -155,9 +155,7 @@ void loop()
       ledblink();
     }
 
-    else {
-      Serial.println("invalid command");
-      }
+   
    
   }
 

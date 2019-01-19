@@ -125,21 +125,21 @@ int main()
         
         Mat seg(img_col.rows,img_col.cols,CV_8UC1,Scalar(0));        //will give segmented image
         //Segmentation of LED colour
-        for(int i=0;i<img_col.rows;i++)
+        /*for(int i=0;i<img_col.rows;d++)
         {
-            for(int j=0;j<img_col.cols;j++)
+            for(int j=0;j<img_col.cols;e++)
             {
                 pix_blue=img_col.at<Vec3b>(i,j)[0];
                 pix_green=img_col.at<Vec3b>(i,j)[1];
                 pix_red=img_col.at<Vec3b>(i,j)[2];
-                if(pix_blue<=40 && pix_blue>=0 && pix_green<=40 && pix_green>=0 && pix_red<=255 && pix_red>=190)
+                if(pix_blue<=high_blue && pix_blue>=low_blue && pix_green<=high_green && pix_green>=low_green && pix_red<=high_red && pix_red>=low_red)
                 {
                     seg.at<uchar>(i,j)=255;
                     white_cnt++;
                 }
             }
         }
-        if(white_cnt>=300)
+        if(white_cnt>=pix_thresh)
         {
             if(flag==0)
                 a++;
@@ -147,18 +147,19 @@ int main()
         }
         if(flag==1 && white_cnt==0)            //white_cnt should be 0 or  less than some min threshold
         {
+            if(RS232_OpenComport(cport_nr,bdrate,mode))        //check if port is open
+            {
+                cout<<"Port not open";
+                continue;
+
+            }
             c='S';
             RS232_cputs(cport_nr,&c);
-            c='K';
+            c='K'
             RS232_cputs(cport_nr,&c);
             flag=0;
-            usleep(200000);
-            c='F';
-            RS232_cputs(cport_nr,&c);
-            usleep(200000);
-        }
+        }*/
         int i;int x=0;
-        float dist;
 		/*for( i=img_col.rows-1;i>=0;i--)
 		{
 			int flag=1;
@@ -186,9 +187,8 @@ int main()
 				img_col.at<Vec3b>(i,j)[2]=x/img_col.cols;
 			}
 		}*/	
-		namedWindow("colour",WINDOW_NORMAL);
-      	 imshow("colour",img_col);
-         waitKey(1);
+		//namedWindow("colour",WINDOW_NORMAL);
+      	 //imshow("colour",img_col);
 		//greyscale conversion
         for(int i=0;i<img_col.rows;i++)
         {
@@ -197,7 +197,7 @@ int main()
                 img1.at<uchar>(i,j)=(int)(0.21*img_col.at<Vec3b>(i,j)[2]+0.72*img_col.at<Vec3b>(i,j)[1]+0.07*img_col.at<Vec3b>(i,j)[0]);
             }
         }   
-       /* for(int i=0;i<img_col.rows;i++)
+        for(int i=0;i<img_col.rows;i++)
         {
             for(int j=0;j<img_col.cols;j++)
             {
@@ -206,13 +206,12 @@ int main()
             }
         }
         erosion(&img1,&img_temp);
-        dilation(&img_temp,&img1);*/
-        Canny(img1,img2,25,25*3,3);      //Threshold value(255) determined by inspection
-        namedWindow("canny",WINDOW_NORMAL);
-       	 imshow("canny",img2);
-         waitKey(1);
+        dilation(&img_temp,&img1);
+        Canny(img1,img2,157,157*3,3);      //Threshold value(255) determined by inspection
+        //namedWindow("canny",WINDOW_NORMAL);
+       	// imshow("canny",img2);
         vector<Vec4i>lines;
-        HoughLinesP(img2, lines, 1, CV_PI/180, 50,50, 10 );
+        HoughLinesP(img2, lines, 1, CV_PI/180, 33, 42, 10 );
             //if(lines[i][1]!=lines[i][3])s, 1, CV_PI/180, 50, 50, 10 );
         vector<float>length;
         vector<float>ang;                 //storing all angles in one vector array 'angle'
@@ -229,9 +228,8 @@ int main()
         arr=(int *)malloc((lines.size())*(sizeof(int)));
         for(int i=0;i<ang.size();i++)
             arr[i]=0;
-        namedWindow("hough",WINDOW_NORMAL);
-        imshow("hough",img3);
-        waitKey(1);
+       // namedWindow("hough",WINDOW_NORMAL);
+        //imshow("hough",img3);
         vector<float>::iterator ptr;
         //condition for no lines detected
         if(ang.size()==0)
@@ -246,7 +244,7 @@ int main()
             int count=0;
             for(int p=i;p<ang.size();p++)
             {
-                if((abs((*(ang.begin()+p))-x)<=8)&&(arr[p]==0))    //the final angle array will contain only "really" distinct lines
+                if((abs((*(ang.begin()+p))-x)<=5)&&(arr[p]==0))    //the final angle array will contain only "really" distinct lines
                 {
                     sum=sum+(*(ang.begin()+p));                    //5 is threshold of angle, determined by inspection
                     sum2=sum2+(*(length.begin()+p));
@@ -257,11 +255,6 @@ int main()
             if(count>0)
                 {
                     finalang.push_back(sum/count);
-                    if(abs(sum/count)<5)
-                      {   dist=lines[i][1];
-                            cout<<dist;
-                            cout<<endl;
-                    }
                     finallen.push_back(sum2);
                 }
         }
@@ -306,7 +299,7 @@ int main()
                 c='F';
                 RS232_cputs(cport_nr,&c);
                 printf("Forward 3\n");
-               // usleep(1000000);
+                usleep(1000000);
             //}
         }
         //we have to find logic for another case
@@ -321,7 +314,7 @@ int main()
              RS232_cputs(cport_nr,&c);   
              if(abs(finalang[0])<5)        //threshold for horizon
              {
-                 if((right_cnt>left_cnt)&&(right_cnt>3)&&(dist>0.75*img_col.rows))
+                 if(right_cnt>left_cnt)
                  {
                      /*if(RS232_OpenComport(cport_nr,bdrate,mode))        //check if port is open
                      {
@@ -330,16 +323,14 @@ int main()
                     }*/
                     int turn=(int)(90/quanta);        //turn given the number of times the bot has to do the command to complete rotation by that angle
                      c='R';
-                     for(int i=0;i<turn;i++)
+                     for(int i=0;i<turn-1;i++)
                      {
                          RS232_cputs(cport_nr,&c);
-                          printf("Right 1 front wall\n");   
+                          printf("Right 1\n");   
                          usleep(300000);   
                      }
-                      left_cnt=0;
-                     right_cnt=0;
                  }
-                 else if((right_cnt<=left_cnt)&&(left_cnt>3)&&(dist>0.75*img_col.rows))
+                 else
                  {
                        /*  if(RS232_OpenComport(cport_nr,bdrate,mode))        //check if port is open
                          {
@@ -348,37 +339,15 @@ int main()
                         }*/
                         int turn=(int)(90/quanta);        //turn given the number of times the bot has to do the command to complete rotation by that angle
                          c='L';
-                         for(int i=0;i<turn;i++)
+                         for(int i=0;i<turn-1;i++)
                          {
                              RS232_cputs(cport_nr,&c);
-                              printf("Left 1 front wall\n");
+                              printf("Left 1\n");
                              usleep(300000);           
                          }
-                          left_cnt=0;
-                            right_cnt=0;
                  }
-                
-                 else if((finalang[0]<0)&&(dist>0.75*img_col.rows))
-                {
-                     c='L';
-                    RS232_cputs(cport_nr,&c);
-                     printf("Left 1 front wall\n");
-                    usleep(300000);  
-                }
-                else if((finalang[0]>0)&&(dist>0.75*img_col.rows))
-                {
-                    c='R';
-                    RS232_cputs(cport_nr,&c);
-                     printf("Right 1 front wall\n");
-                    usleep(300000);   
-                }
-                else
-                {
-                    c='F';
-                    RS232_cputs(cport_nr,&c);
-                    printf("Forward 1");
-                  //  usleep(1000000);
-                }
+                 left_cnt=0;
+                 right_cnt=0;
              }
             else                                                           
             {
@@ -421,13 +390,11 @@ int main()
             c='S';
             RS232_cputs(cport_nr,&c);
             int j;
-            if(abs(finalang[0])>5)      //15 is a threshold
+            if(abs(finalang[0])>15)      //15 is a threshold
                 j=0;
-            else if(abs(finalang[1]>5))
-                j=1;
             else
-                continue;
-           if(finallen[j]<250)
+                j=1;
+            if(finallen[j]<300)
             {
                 if(finalang[j]>0)
                 {
@@ -435,9 +402,9 @@ int main()
                     RS232_cputs(cport_nr,&c);
                      printf("Right 2\n");
                     usleep(300000);   					//to be decided how many times this quanta is to be given
-                  //  RS232_cputs(cport_nr,&c);
-                    // printf("Right 2\n");
-                    //usleep(300000);   
+                    RS232_cputs(cport_nr,&c);
+                     printf("Right 2\n");
+                    usleep(300000);   
                 }
                 else
                 {
@@ -445,9 +412,9 @@ int main()
                     RS232_cputs(cport_nr,&c);
                      printf("Left 2\n");
                     usleep(300000);   
-                   /* RS232_cputs(cport_nr,&c);
+                    RS232_cputs(cport_nr,&c);
                      printf("Left 2\n");
-                    usleep(300000); */  
+                    usleep(300000);   
                 }   
             }
             else
@@ -455,10 +422,10 @@ int main()
                     c='F';
                     RS232_cputs(cport_nr,&c);
                      printf("Forward 2\n");
-                   // usleep(1000000); 
+                    usleep(500000); 
             }
         }
-        usleep(250000);       //tbd
+        usleep(500000);       //tbd
      }
 	return 0;
 }
